@@ -1,23 +1,34 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import Particles from "react-tsparticles";
 import { loadFull } from "tsparticles";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  Moon,
-  Sun,
-  Calendar,
-  ChevronDown,
-  ChevronUp,
-  Loader2,
-} from "lucide-react";
+import { Moon, Sun, Calendar, Loader2, Volume2, VolumeX } from "lucide-react";
 
 function App() {
   const [date, setDate] = useState("");
   const [moonData, setMoonData] = useState(null);
   const [error, setError] = useState("");
-  const [showDetails, setShowDetails] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [isMuted, setIsMuted] = useState(true);
+  const audioRef = useRef(new Audio("assets/star.mp3"));
+
+  useEffect(() => {
+    audioRef.current.loop = true;
+    return () => {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    };
+  }, []);
+
+  const toggleSound = () => {
+    if (isMuted) {
+      audioRef.current.play();
+    } else {
+      audioRef.current.pause();
+    }
+    setIsMuted(!isMuted);
+  };
 
   useEffect(() => {
     const fetchInitialData = async () => {
@@ -58,6 +69,26 @@ function App() {
     }
   };
 
+  const fetchTodaysMoonPhase = async () => {
+    try {
+      setLoading(true);
+      setError("");
+      const today = new Date().toISOString().split("T")[0];
+      setDate(today);
+      const response = await axios.post(
+        "http://127.0.0.1:8000/phase_for_date",
+        {
+          date: today,
+        }
+      );
+      setMoonData(response.data);
+    } catch (err) {
+      setError("Failed to fetch today's moon phase data. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const particlesInit = async (engine) => {
     await loadFull(engine);
   };
@@ -66,7 +97,7 @@ function App() {
     fullScreen: { enable: true, zIndex: -1 },
     background: {
       color: {
-        value: "#0B1120",
+        value: "#000000",
       },
     },
     particles: {
@@ -74,7 +105,7 @@ function App() {
         value: 100,
         density: {
           enable: true,
-          value_area: 800,
+          value_area: 300,
         },
       },
       color: {
@@ -88,7 +119,7 @@ function App() {
         random: true,
         animation: {
           enable: true,
-          speed: 1,
+          speed: 2,
           minimumValue: 0.1,
           sync: false,
         },
@@ -98,7 +129,7 @@ function App() {
         random: true,
         animation: {
           enable: true,
-          speed: 2,
+          speed: 4,
           minimumValue: 0.3,
           sync: false,
         },
@@ -117,134 +148,166 @@ function App() {
   };
 
   return (
-    <div className="relative flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-[#0B1120] to-[#1a1b26] text-white font-sans">
+    <div className="fixed inset-0 overflow-y-auto bg-gradient-to-b from-[#0B1120] to-[#1a1b26] text-white font-sans">
       <Particles init={particlesInit} options={particleOptions} />
 
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-2xl p-8 backdrop-blur-lg bg-gray-900/40 rounded-2xl shadow-2xl border border-gray-700/30"
+      {/* Sound Toggle Button */}
+      <motion.button
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.9 }}
+        onClick={toggleSound}
+        className="fixed top-4 right-4 z-50 p-3 bg-gray-800/50 backdrop-blur-lg rounded-full hover:bg-gray-700/50 transition-colors"
       >
-        <motion.div
-          initial={{ scale: 0.9 }}
-          animate={{ scale: 1 }}
-          className="flex items-center justify-center gap-3 mb-8"
-        >
-          <Moon className="w-8 h-8 text-blue-400" />
-          <h1 className="text-4xl font-bold text-center bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-            Moon Phase Visualizer
-          </h1>
-        </motion.div>
-
-        <div className="mb-8 flex flex-col items-center space-y-4">
-          <div className="flex items-center gap-3 bg-gray-800/50 p-3 rounded-lg">
-            <Calendar className="w-5 h-5 text-blue-400" />
-            <input
-              type="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              className="bg-transparent border-none focus:outline-none focus:ring-0 text-white"
-            />
-          </div>
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={fetchMoonPhase}
-            className="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-2"
-          >
-            {loading ? (
-              <Loader2 className="w-5 h-5 animate-spin" />
-            ) : (
-              <>
-                <Moon className="w-5 h-5" />
-                Get Moon Phase
-              </>
-            )}
-          </motion.button>
-        </div>
-
-        {error && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="text-red-400 text-center p-4 bg-red-900/20 rounded-lg mb-6"
-          >
-            {error}
-          </motion.div>
+        {isMuted ? (
+          <VolumeX className="w-6 h-6 text-gray-300" />
+        ) : (
+          <Volume2 className="w-6 h-6 text-blue-400" />
         )}
+      </motion.button>
 
-        <AnimatePresence>
-          {moonData && !moonData.error && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className="space-y-6"
-            >
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-                <motion.img
-                  initial={{ scale: 0.8 }}
-                  animate={{ scale: 1 }}
-                  src={moonData.image_url}
-                  alt="Moon Phase"
-                  className="w-full rounded-full shadow-2xl ring-4 ring-blue-500/20"
-                />
+      <div className="min-h-screen w-full p-4 md:p-8 lg:p-12">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="h-full"
+        >
+          {/* Header */}
+          <motion.div
+            initial={{ scale: 0.9 }}
+            animate={{ scale: 1 }}
+            className="flex items-center justify-center gap-3 mb-8"
+          >
+            <Moon className="w-8 h-8 md:w-12 md:h-12 text-blue-400" />
+            <h1 className="text-4xl md:text-6xl font-bold text-center bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+              Moon Phase Visualizer
+            </h1>
+          </motion.div>
 
-                <div className="space-y-4">
-                  <div className="bg-gray-800/50 p-4 rounded-lg">
-                    <h3 className="text-lg font-semibold mb-2 text-blue-400">
-                      Current Phase
-                    </h3>
-                    <p className="text-2xl font-bold">
-                      {moonData.illumination_percentage.toFixed(2)}% Illuminated
-                    </p>
-                    <p className="text-gray-400">{moonData.date}</p>
-                  </div>
+          {/* Main Content */}
+          <div className="flex flex-col lg:flex-row lg:gap-12 h-full pt-20">
+            {/* Left Side - Controls and New Moon */}
+            <div className="w-full lg:w-1/4 flex flex-col gap-6 mb-8 lg:mb-0">
+              <div className="flex flex-col gap-4 bg-gray-800/50 p-6 rounded-lg backdrop-blur-lg">
+                <div className="flex items-center gap-3">
+                  <Calendar className="w-6 h-6 text-blue-400 flex-shrink-0" />
+                  <input
+                    type="date"
+                    value={date}
+                    onChange={(e) => setDate(e.target.value)}
+                    className="bg-transparent border-none focus:outline-none focus:ring-0 text-white w-full text-lg"
+                    style={{ color: "#ffffff" }} // Ensure the date picker text is white
+                  />
                 </div>
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={fetchMoonPhase}
+                  className="w-full py-3 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2 text-lg"
+                >
+                  {loading ? (
+                    <Loader2 className="w-6 h-6 animate-spin" />
+                  ) : (
+                    <>
+                      <Moon className="w-6 h-6" />
+                      Get Moon Phase
+                    </>
+                  )}
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={fetchTodaysMoonPhase}
+                  className="w-full py-3 bg-gradient-to-r from-purple-500 to-blue-500 rounded-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2 text-lg"
+                >
+                  {loading ? (
+                    <Loader2 className="w-6 h-6 animate-spin" />
+                  ) : (
+                    <>
+                      <Moon className="w-6 h-6" />
+                      Today's Moon Phase
+                    </>
+                  )}
+                </motion.button>
               </div>
 
-              <motion.button
-                onClick={() => setShowDetails(!showDetails)}
-                className="w-full p-4 bg-gray-800/50 rounded-lg flex items-center justify-between hover:bg-gray-700/50 transition-colors"
-              >
-                <span className="font-medium">Next Moon Events</span>
-                {showDetails ? (
-                  <ChevronUp className="w-5 h-5" />
-                ) : (
-                  <ChevronDown className="w-5 h-5" />
-                )}
-              </motion.button>
+              {moonData && !moonData.error && (
+                <div className="bg-gray-800/50 p-6 rounded-lg backdrop-blur-lg">
+                  <div className="flex items-center gap-3 mb-4">
+                    <Moon className="w-6 h-6 text-blue-400" />
+                    <h3 className="text-xl font-semibold">Next New Moon</h3>
+                  </div>
+                  <p className="text-lg text-gray-300">
+                    {moonData.next_new_moon}
+                  </p>
+                </div>
+              )}
 
-              <AnimatePresence>
-                {showDetails && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                    exit={{ opacity: 0, height: 0 }}
-                    className="grid grid-cols-1 md:grid-cols-2 gap-4"
-                  >
-                    <div className="bg-gray-800/50 p-4 rounded-lg">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Moon className="w-5 h-5 text-blue-400" />
-                        <h3 className="font-semibold">Next New Moon</h3>
-                      </div>
-                      <p className="text-lg">{moonData.next_new_moon}</p>
+              {error && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="text-red-400 text-center p-4 bg-red-900/20 rounded-lg"
+                >
+                  {error}
+                </motion.div>
+              )}
+            </div>
+
+            {/* Center and Right - Moon Display and Details */}
+            <AnimatePresence>
+              {moonData && !moonData.error && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="flex-1 flex flex-col lg:flex-row gap-8"
+                >
+                  {/* Moon Image */}
+                  <div className="lg:flex-1 flex items-center justify-center">
+                    <motion.div
+                      initial={{ scale: 0.8 }}
+                      animate={{ scale: 1 }}
+                      className="relative aspect-square w-full max-w-xl"
+                    >
+                      <img
+                        src={moonData.image_url}
+                        alt="Moon Phase"
+                        className="w-full h-full object-cover rounded-full shadow-2xl ring-4 ring-blue-500/20"
+                      />
+                    </motion.div>
+                  </div>
+
+                  {/* Moon Details */}
+                  <div className="lg:w-1/3 space-y-6">
+                    <div className="bg-gray-800/50 p-6 rounded-lg backdrop-blur-lg">
+                      <h3 className="text-2xl font-semibold mb-4 text-blue-400">
+                        Current Phase
+                      </h3>
+                      <p className="text-4xl font-bold mb-2">
+                        {moonData.illumination_percentage.toFixed(2)}%
+                        Illuminated
+                      </p>
+                      <p className="text-xl text-gray-400">{moonData.date}</p>
                     </div>
 
-                    <div className="bg-gray-800/50 p-4 rounded-lg">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Sun className="w-5 h-5 text-yellow-400" />
-                        <h3 className="font-semibold">Next Full Moon</h3>
+                    <div className="bg-gray-800/50 p-6 rounded-lg backdrop-blur-lg">
+                      <div className="flex items-center gap-3 mb-4">
+                        <Sun className="w-6 h-6 text-yellow-400" />
+                        <h3 className="text-xl font-semibold">
+                          Next Full Moon
+                        </h3>
                       </div>
-                      <p className="text-lg">{moonData.next_full_moon}</p>
+                      <p className="text-lg text-gray-300">
+                        {moonData.next_full_moon}
+                      </p>
                     </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </motion.div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </motion.div>
+      </div>
     </div>
   );
 }
