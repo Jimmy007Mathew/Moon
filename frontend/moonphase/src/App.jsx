@@ -3,7 +3,16 @@ import axios from "axios";
 import Particles from "react-tsparticles";
 import { loadFull } from "tsparticles";
 import { motion, AnimatePresence } from "framer-motion";
-import { Moon, Sun, Calendar, Loader2, Volume2, VolumeX } from "lucide-react";
+import {
+  Moon,
+  Sun,
+  Calendar,
+  Loader2,
+  Volume2,
+  VolumeX,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 
 function App() {
   const [date, setDate] = useState("");
@@ -13,6 +22,7 @@ function App() {
   const [isMuted, setIsMuted] = useState(true);
   const audioRef = useRef(new Audio("assets/star.mp3"));
 
+  // Audio controls
   useEffect(() => {
     audioRef.current.loop = true;
     return () => {
@@ -30,6 +40,7 @@ function App() {
     setIsMuted(!isMuted);
   };
 
+  // Fetch initial data
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
@@ -51,6 +62,7 @@ function App() {
     fetchInitialData();
   }, []);
 
+  // Fetch moon phase for a specific date
   const fetchMoonPhase = async () => {
     try {
       setLoading(true);
@@ -69,6 +81,7 @@ function App() {
     }
   };
 
+  // Fetch today's moon phase
   const fetchTodaysMoonPhase = async () => {
     try {
       setLoading(true);
@@ -89,23 +102,53 @@ function App() {
     }
   };
 
+  // Day navigation handlers
+  const handlePreviousDay = () => {
+    const newDate = new Date(date);
+    newDate.setDate(newDate.getDate() - 1);
+    setDate(newDate.toISOString().split("T")[0]);
+    fetchMoonPhase();
+  };
+
+  const handleNextDay = () => {
+    const newDate = new Date(date);
+    newDate.setDate(newDate.getDate() + 1);
+    setDate(newDate.toISOString().split("T")[0]);
+    fetchMoonPhase();
+  };
+
+  // Particles initialization
   const particlesInit = async (engine) => {
     await loadFull(engine);
   };
 
+  // Particle configuration
   const particleOptions = {
-    fullScreen: { enable: true, zIndex: -1 },
+    fullScreen: { enable: false, zIndex: -1 }, // Disable fullscreen to prevent shifting
     background: {
-      color: {
-        value: "#000000",
+      color: "#000000",
+    },
+    interactivity: {
+      events: {
+        onHover: {
+          enable: true,
+          mode: "attract", // Particles react to mouse hover
+        },
+        resize: true,
+      },
+      modes: {
+        repulse: {
+          distance: 5, // Distance of repulsion effect
+          duration: 10,
+        },
       },
     },
     particles: {
       number: {
-        value: 100,
+        value: 1000,
         density: {
           enable: true,
-          value_area: 300,
+          value_area: 800,
         },
       },
       color: {
@@ -119,7 +162,7 @@ function App() {
         random: true,
         animation: {
           enable: true,
-          speed: 2,
+          speed: 1,
           minimumValue: 0.1,
           sync: false,
         },
@@ -143,13 +186,26 @@ function App() {
         outModes: {
           default: "out",
         },
+        attract: {
+          enable: false,
+          rotateX: 600,
+          rotateY: 1200,
+        },
       },
     },
+    detectRetina: true,
   };
 
   return (
     <div className="fixed inset-0 overflow-y-auto bg-gradient-to-b from-[#0B1120] to-[#1a1b26] text-white font-sans">
-      <Particles init={particlesInit} options={particleOptions} />
+      {/* Particles Container */}
+      <div className="fixed inset-0 z-0">
+        <Particles
+          init={particlesInit}
+          options={particleOptions}
+          style={{ position: "fixed" }}
+        />
+      </div>
 
       {/* Sound Toggle Button */}
       <motion.button
@@ -165,6 +221,27 @@ function App() {
         )}
       </motion.button>
 
+      {/* Day Navigation Buttons */}
+      <div className="fixed bottom-4 left-4 right-4 flex justify-between pointer-events-none">
+        <motion.button
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          onClick={handlePreviousDay}
+          className="pointer-events-auto p-3 bg-gray-800/50 backdrop-blur-lg rounded-full hover:bg-gray-700/50 transition-colors"
+        >
+          <ChevronLeft className="w-6 h-6 text-blue-400" />
+        </motion.button>
+
+        <motion.button
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          onClick={handleNextDay}
+          className="pointer-events-auto p-3 bg-gray-800/50 backdrop-blur-lg rounded-full hover:bg-gray-700/50 transition-colors"
+        >
+          <ChevronRight className="w-6 h-6 text-blue-400" />
+        </motion.button>
+      </div>
+
       <div className="min-h-screen w-full p-4 md:p-8 lg:p-12">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -176,15 +253,10 @@ function App() {
             initial={{ scale: 0.9 }}
             animate={{ scale: 1 }}
             className="flex items-center justify-center gap-3 mb-8"
-          >
-            <Moon className="w-8 h-8 md:w-12 md:h-12 text-blue-400" />
-            <h1 className="text-4xl md:text-6xl font-bold text-center bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-              Moon Phase Visualizer
-            </h1>
-          </motion.div>
+          ></motion.div>
 
           {/* Main Content */}
-          <div className="flex flex-col lg:flex-row lg:gap-12 h-full pt-20">
+          <div className="flex flex-col lg:flex-row lg:gap-12 h-full pt-10">
             {/* Left Side - Controls and New Moon */}
             <div className="w-full lg:w-1/4 flex flex-col gap-6 mb-8 lg:mb-0">
               <div className="flex flex-col gap-4 bg-gray-800/50 p-6 rounded-lg backdrop-blur-lg">
@@ -195,7 +267,7 @@ function App() {
                     value={date}
                     onChange={(e) => setDate(e.target.value)}
                     className="bg-transparent border-none focus:outline-none focus:ring-0 text-white w-full text-lg"
-                    style={{ color: "#ffffff" }} // Ensure the date picker text is white
+                    style={{ color: "#ffffff" }}
                   />
                 </div>
                 <motion.button
@@ -272,7 +344,7 @@ function App() {
                       <img
                         src={moonData.image_url}
                         alt="Moon Phase"
-                        className="w-full h-full object-cover rounded-full shadow-2xl ring-4 ring-blue-500/20"
+                        className="w-full h-full object-cover rounded-full shadow-2xl  ring-blue-500/20"
                       />
                     </motion.div>
                   </div>

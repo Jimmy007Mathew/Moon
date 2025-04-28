@@ -8,15 +8,13 @@ from typing import Optional
 
 app = FastAPI()
 
-# Enable CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Adjust for specific domains, e.g., ["http://localhost:3000"]
+    allow_origins=["*"],  
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Serve moon phase images
 app.mount("/moon_images", StaticFiles(directory="moon_images"), name="moon_images")
 
 
@@ -33,28 +31,23 @@ def calculate_image_number(date_obj,illumination_percentage) -> int:
         return round(101+(1-(illumination_percentage) / 100) * 100)
 
 
-# Request model
 class PhaseRequest(BaseModel):
-    date: Optional[str] = None  # Optional date in "YYYY-MM-DD" format
+    date: Optional[str] = None  
 
 @app.post("/phase_for_date")
 def phase_for_date(request: PhaseRequest):
     try:
-        # Parse the date or use today's date
         if request.date:
             date_obj = datetime.datetime.strptime(request.date, "%Y-%m-%d").date()
         else:
             date_obj = datetime.date.today()
 
-        # Calculate moon details
         moon = ephem.Moon(date_obj)
         illumination_percentage = moon.phase
         image_number = calculate_image_number(date_obj,illumination_percentage)
 
-        # Construct the image URL using the naming convention
         image_url = f"http://127.0.0.1:8000/moon_images/{image_number}.jpg"
 
-        # Calculate next new moon and full moon
         next_new_moon = ephem.next_new_moon(date_obj).datetime().strftime("%Y-%m-%d %H:%M:%S")
         next_full_moon = ephem.next_full_moon(date_obj).datetime().strftime("%Y-%m-%d %H:%M:%S")
 
