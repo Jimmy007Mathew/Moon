@@ -136,7 +136,6 @@ POST http://127.0.0.1:8000/clear_cache
 
  ![Home](./home.png) 
 
-*(Add your screenshots if available)*
 
 ---
 
@@ -153,14 +152,3 @@ Feel free to open issues or submit features you'd like to see!
 
 ---
 
-## 📬 Contact
-
-- GitHub: [@your-username](https://github.com/your-username)
-- Email: your-email@example.com
-
----
-
----
-
-Would you also like me to generate a **`LICENSE`** file and **`package.json` sample** for the frontend to make your project fully professional? 🚀  
-(You can copy-paste everything easily if you want.)
