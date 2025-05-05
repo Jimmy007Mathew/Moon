@@ -1,1 +1,166 @@
-c044b791606c53c80989f959dadb33123fed83db
+
+# 🌙 Moon Phase Visualizer
+
+A simple web application that allows users to input a date and view the moon phase information for that day — including illumination percentage, moon phase image, next new moon, and next full moon.
+
+Built with **React (Frontend)**, **Tailwind CSS**, and **FastAPI (Backend)**.
+
+---
+
+## 🚀 Features
+
+- Enter a date to visualize the moon's phase.
+- Displays:
+  - Illumination percentage
+  - Corresponding moon phase image
+  - Date and time of the next new moon
+  - Date and time of the next full moon
+- Smooth starry background animation ✨
+- Fast and lightweight backend using FastAPI.
+- CORS enabled for easy frontend-backend communication.
+
+---
+
+## 🛠 Tech Stack
+
+- **Frontend:** React, Tailwind CSS, Axios
+- **Backend:** FastAPI, Ephem (astronomy calculations)
+- **Other:** Static file serving (for moon phase images)
+
+---
+
+## 📁 Project Structure
+
+```
+root/
+├── assets/
+│   ├── app.css          # Tailwind and custom styles
+│   ├── app.jsx          # Main React app
+│   ├── index.css        # Global styles
+│   ├── main.jsx         # React app entry point
+├── moon_images/         # Static images for moon phases
+├── main.py              # FastAPI backend server
+├── README.md            # This documentation
+└── package.json         # React project dependencies
+```
+
+---
+
+## ⚙️ Setup Instructions
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/your-username/moon-phase-visualizer.git
+cd moon-phase-visualizer
+```
+
+### 2. Frontend Setup (React)
+
+- Install Node.js (if not installed).
+- Install dependencies:
+
+```bash
+npm install
+```
+
+- Run the React development server:
+
+```bash
+npm run dev
+```
+
+Frontend will be available at `http://localhost:5173/` (or as configured).
+
+---
+
+### 3. Backend Setup (FastAPI)
+
+- Create a virtual environment (optional but recommended):
+
+```bash
+python -m venv env
+source env/bin/activate  # On Windows: .\env\Scripts\activate
+```
+
+- Install Python dependencies:
+
+```bash
+pip install fastapi uvicorn ephem pydantic
+```
+
+- Run the FastAPI server:
+
+```bash
+uvicorn main:app --reload
+```
+
+Backend will be available at `http://127.0.0.1:8000/`.
+
+- API Documentation (Swagger UI) will be available at:  
+  `http://127.0.0.1:8000/docs`
+
+---
+
+## 🔥 Star Animation Background
+
+The starry background animation can be integrated using a `<Starfield />` component separately, or you can use a pure Tailwind/CSS method for animated stars.
+
+Ensure it is rendered **behind** the app content using absolute positioning.
+
+---
+
+## ❓ API Endpoints
+
+| Endpoint            | Method | Description                          |
+|---------------------|--------|--------------------------------------|
+| `/phase_for_date`    | POST   | Get moon phase info for a given date |
+| `/moon_images`       | GET    | Serve static moon phase images       |
+| `/clear_cache` (optional) | POST | Clear in-memory/redis cache if implemented |
+
+---
+
+## 🧹 Clearing Backend Cache (Optional)
+
+If caching is implemented, you can clear it by sending a POST request to:
+
+```bash
+POST http://127.0.0.1:8000/clear_cache
+```
+
+(Feature needs to be added if required.)
+
+---
+
+## 📸 Screenshots
+
+ ![Home](./home.png) 
+
+*(Add your screenshots if available)*
+
+---
+
+## 📜 License
+
+This project is licensed under the [MIT License](LICENSE).
+
+---
+
+## 🤝 Contributing
+
+Pull requests are welcome!  
+Feel free to open issues or submit features you'd like to see!
+
+---
+
+## 📬 Contact
+
+- GitHub: [@your-username](https://github.com/your-username)
+- Email: your-email@example.com
+
+---
+
+---
+
+Would you also like me to generate a **`LICENSE`** file and **`package.json` sample** for the frontend to make your project fully professional? 🚀  
+(You can copy-paste everything easily if you want.)
