@@ -134,7 +134,7 @@ POST http://127.0.0.1:8000/clear_cache
 
 ## 📸 Screenshots
 
-| ![Home](./home.png) |
+ ![Home](./home.png) 
 
 *(Add your screenshots if available)*
 
