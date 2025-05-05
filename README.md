@@ -134,9 +134,7 @@ POST http://127.0.0.1:8000/clear_cache
 
 ## 📸 Screenshots
 
-| Home Page | Moon Phase Info |
-| :-------- | :-------------- |
-| ![Home](./assets/screenshots/home.png) | ![Result](./assets/screenshots/result.png) |
+| ![Home](./assets/screenshots/home.png) |
 
 *(Add your screenshots if available)*
 
