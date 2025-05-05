@@ -96,36 +96,6 @@ uvicorn main:app --reload
 ```
 
 Backend will be available at `http://127.0.0.1:8000/`.
-
-- API Documentation (Swagger UI) will be available at:  
-  `http://127.0.0.1:8000/docs`
-
----
-
-## 🔥 Star Animation Background
-
-The starry background animation can be integrated using a `<Starfield />` component separately, or you can use a pure Tailwind/CSS method for animated stars.
-
-Ensure it is rendered **behind** the app content using absolute positioning.
-
----
-
-## ❓ API Endpoints
-
-| Endpoint            | Method | Description                          |
-|---------------------|--------|--------------------------------------|
-| `/phase_for_date`    | POST   | Get moon phase info for a given date |
-| `/moon_images`       | GET    | Serve static moon phase images       |
-| `/clear_cache` (optional) | POST | Clear in-memory/redis cache if implemented |
-
----
-
-## 🧹 Clearing Backend Cache (Optional)
-
-If caching is implemented, you can clear it by sending a POST request to:
-
-```bash
-POST http://127.0.0.1:8000/clear_cache
 ```
 
 (Feature needs to be added if required.)
@@ -136,7 +106,6 @@ POST http://127.0.0.1:8000/clear_cache
 
  ![Home](./home.png) 
 
-*(Add your screenshots if available)*
 
 ---
 
@@ -152,15 +121,3 @@ Pull requests are welcome!
 Feel free to open issues or submit features you'd like to see!
 
 ---
-
-## 📬 Contact
-
-- GitHub: [@your-username](https://github.com/your-username)
-- Email: your-email@example.com
-
----
-
----
-
-Would you also like me to generate a **`LICENSE`** file and **`package.json` sample** for the frontend to make your project fully professional? 🚀  
-(You can copy-paste everything easily if you want.)
