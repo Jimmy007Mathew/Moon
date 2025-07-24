@@ -21,6 +21,7 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [isMuted, setIsMuted] = useState(true);
   const audioRef = useRef(new Audio("assets/star.mp3"));
+  const dateInputRef = useRef(null);
 
   // Audio controls
   useEffect(() => {
@@ -40,20 +41,16 @@ function App() {
     setIsMuted(!isMuted);
   };
 
-  // Fetch initial data
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
         const today = new Date().toISOString().split("T")[0];
         setDate(today);
         const response = await axios.post(
-          "https://moon-o9aq.onrender.com/phase_for_date",
-          {
-            date: today,
-          }
+          "https://moon-o9aq.onrender.com/phase_for_date", { date: today }
         );
         setMoonData(response.data);
-      } catch (err) {
+      } catch {
         setError("Failed to fetch moon phase data. Please try again.");
       } finally {
         setLoading(false);
@@ -62,27 +59,22 @@ function App() {
     fetchInitialData();
   }, []);
 
-  // Always use the passed date, or current state as fallback
   const fetchMoonPhase = async (reqDate) => {
     try {
       setLoading(true);
       setError("");
       const apiDate = reqDate || date || undefined;
       const response = await axios.post(
-        "https://moon-o9aq.onrender.com/phase_for_date",
-        {
-          date: apiDate,
-        }
+        "https://moon-o9aq.onrender.com/phase_for_date", { date: apiDate }
       );
       setMoonData(response.data);
-    } catch (err) {
+    } catch {
       setError("Failed to fetch moon phase data. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
-  // Fetch today's moon phase
   const fetchTodaysMoonPhase = async () => {
     try {
       setLoading(true);
@@ -90,20 +82,16 @@ function App() {
       const today = new Date().toISOString().split("T")[0];
       setDate(today);
       const response = await axios.post(
-        "https://moon-o9aq.onrender.com/phase_for_date",
-        {
-          date: today,
-        }
+        "https://moon-o9aq.onrender.com/phase_for_date", { date: today }
       );
       setMoonData(response.data);
-    } catch (err) {
+    } catch {
       setError("Failed to fetch today's moon phase data. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
-  // Compute new date, update state, and fetch using that new date
   const handlePreviousDay = () => {
     const newDateObj = new Date(date);
     newDateObj.setDate(newDateObj.getDate() - 1);
@@ -120,11 +108,11 @@ function App() {
     fetchMoonPhase(newDateStr);
   };
 
+  // --- Particle options as before ---
   const particlesInit = async (engine) => {
     await loadFull(engine);
   };
 
-  // --- Particle options as before ---
   const particleOptions = {
     fullScreen: { enable: false, zIndex: -1 },
     background: { color: "#000000" },
@@ -134,17 +122,11 @@ function App() {
         resize: true,
       },
       modes: {
-        repulse: {
-          distance: 5,
-          duration: 10,
-        },
+        repulse: { distance: 5, duration: 10 },
       },
     },
     particles: {
-      number: {
-        value: 1000,
-        density: { enable: true, value_area: 800 },
-      },
+      number: { value: 1000, density: { enable: true, value_area: 800 } },
       color: { value: ["#ffffff", "#87CEEB"] },
       shape: { type: "circle" },
       opacity: {
@@ -174,6 +156,7 @@ function App() {
     detectRetina: true,
   };
 
+  // --- Main render ---
   return (
     <div className="fixed inset-0 overflow-y-auto bg-gradient-to-b from-[#0B1120] to-[#1a1b26] text-white font-sans">
       {/* Particles Container */}
@@ -201,7 +184,15 @@ function App() {
       </motion.button>
 
       {/* Day Navigation Buttons */}
-      <div className="fixed bottom-4 left-4 right-4 flex justify-between z-20">
+      <div
+        className={`
+          fixed bottom-4 z-20
+          flex gap-6
+          w-full justify-center
+          px-0
+          sm:left-4 sm:right-4 sm:justify-between sm:gap-0
+        `}
+      >
         <motion.button
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
@@ -243,21 +234,33 @@ function App() {
               <div className="flex flex-col gap-4 bg-gray-800/50 p-6 rounded-lg backdrop-blur-lg">
                 <div className="flex items-center gap-3">
                   <Calendar className="w-6 h-6 text-blue-400 flex-shrink-0" />
+                  {/* Hidden Date Input */}
                   <input
                     type="date"
+                    ref={dateInputRef}
                     value={date}
-                    onChange={(e) => setDate(e.target.value)}
-                    className="bg-transparent border-none focus:outline-none focus:ring-0 text-white w-full text-lg"
-                    style={{ color: "#ffffff" }}
+                    onChange={async e => {
+                      setDate(e.target.value);
+                      await fetchMoonPhase(e.target.value);
+                    }}
+                    className="absolute opacity-0 pointer-events-none w-0 h-0"
+                    tabIndex={-1}
                   />
                 </div>
+
+                {/* Button to show the calendar/date picker */}
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  onClick={() => fetchMoonPhase(date)}
+                  onClick={() => dateInputRef.current && dateInputRef.current.showPicker
+                    ? dateInputRef.current.showPicker() // modern browsers
+                    : dateInputRef.current.click() // fallback
+                  }
                   className="w-full py-3 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2 text-lg"
                   disabled={loading}
                   style={{ touchAction: "manipulation" }}
+                  aria-label="Choose date for moon phase"
+                  type="button"
                 >
                   {loading ? (
                     <Loader2 className="w-6 h-6 animate-spin" />
@@ -268,6 +271,7 @@ function App() {
                     </>
                   )}
                 </motion.button>
+
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
