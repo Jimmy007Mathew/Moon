@@ -46,7 +46,7 @@ def phase_for_date(request: PhaseRequest):
         illumination_percentage = moon.phase
         image_number = calculate_image_number(date_obj,illumination_percentage)
 
-        image_url = f"http://127.0.0.1:8000/moon_images/{image_number}.jpg"
+        image_url = f"https://moon-o9aq.onrender.com/moon_images/{image_number}.jpg"
 
         next_new_moon = ephem.next_new_moon(date_obj).datetime().strftime("%Y-%m-%d %H:%M:%S")
         next_full_moon = ephem.next_full_moon(date_obj).datetime().strftime("%Y-%m-%d %H:%M:%S")
