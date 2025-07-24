@@ -47,7 +47,7 @@ function App() {
         const today = new Date().toISOString().split("T")[0];
         setDate(today);
         const response = await axios.post(
-          "http://127.0.0.1:8000/phase_for_date",
+          "https://moon-o9aq.onrender.com/phase_for_date",
           {
             date: today,
           }
@@ -68,7 +68,7 @@ function App() {
       setLoading(true);
       setError("");
       const response = await axios.post(
-        "http://127.0.0.1:8000/phase_for_date",
+        "https://moon-o9aq.onrender.com/phase_for_date",
         {
           date: date || undefined,
         }
@@ -89,7 +89,7 @@ function App() {
       const today = new Date().toISOString().split("T")[0];
       setDate(today);
       const response = await axios.post(
-        "http://127.0.0.1:8000/phase_for_date",
+        "https://moon-o9aq.onrender.com/phase_for_date",
         {
           date: today,
         }
