@@ -201,28 +201,35 @@ function App() {
       </motion.button>
 
       {/* Day Navigation Buttons */}
-      <div className="fixed bottom-4 left-4 right-4 flex justify-between z-20">
-        <motion.button
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
-          onClick={handlePreviousDay}
-          className="p-3 bg-gray-800/50 backdrop-blur-lg rounded-full hover:bg-gray-700/50 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400 active:bg-gray-700/70"
-          style={{ touchAction: "manipulation" }}
-        >
-          <ChevronLeft className="w-6 h-6 text-blue-400" />
-        </motion.button>
+     <div
+  className={`
+    fixed bottom-4 z-20
+    flex gap-6
+    w-full justify-center
+    px-0
+    sm:left-4 sm:right-4 sm:justify-between sm:gap-0
+  `}
+>
+  <motion.button
+    whileHover={{ scale: 1.1 }}
+    whileTap={{ scale: 0.9 }}
+    onClick={handlePreviousDay}
+    className="p-3 bg-gray-800/50 backdrop-blur-lg rounded-full hover:bg-gray-700/50 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400 active:bg-gray-700/70"
+    style={{ touchAction: "manipulation" }}
+  >
+    <ChevronLeft className="w-6 h-6 text-blue-400" />
+  </motion.button>
 
-        <motion.button
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
-          onClick={handleNextDay}
-          className="p-3 bg-gray-800/50 backdrop-blur-lg rounded-full hover:bg-gray-700/50 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400 active:bg-gray-700/70"
-          style={{ touchAction: "manipulation" }}
-        >
-          <ChevronRight className="w-6 h-6 text-blue-400" />
-        </motion.button>
-      </div>
-
+  <motion.button
+    whileHover={{ scale: 1.1 }}
+    whileTap={{ scale: 0.9 }}
+    onClick={handleNextDay}
+    className="p-3 bg-gray-800/50 backdrop-blur-lg rounded-full hover:bg-gray-700/50 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400 active:bg-gray-700/70"
+    style={{ touchAction: "manipulation" }}
+  >
+    <ChevronRight className="w-6 h-6 text-blue-400" />
+  </motion.button>
+</div>
       <div className="min-h-screen w-full p-4 md:p-8 lg:p-12">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
