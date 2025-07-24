@@ -47,7 +47,8 @@ function App() {
         const today = new Date().toISOString().split("T")[0];
         setDate(today);
         const response = await axios.post(
-          "https://moon-o9aq.onrender.com/phase_for_date", { date: today }
+          "https://moon-o9aq.onrender.com/phase_for_date",
+          { date: today }
         );
         setMoonData(response.data);
       } catch {
@@ -65,7 +66,8 @@ function App() {
       setError("");
       const apiDate = reqDate || date || undefined;
       const response = await axios.post(
-        "https://moon-o9aq.onrender.com/phase_for_date", { date: apiDate }
+        "https://moon-o9aq.onrender.com/phase_for_date",
+        { date: apiDate }
       );
       setMoonData(response.data);
     } catch {
@@ -82,7 +84,8 @@ function App() {
       const today = new Date().toISOString().split("T")[0];
       setDate(today);
       const response = await axios.post(
-        "https://moon-o9aq.onrender.com/phase_for_date", { date: today }
+        "https://moon-o9aq.onrender.com/phase_for_date",
+        { date: today }
       );
       setMoonData(response.data);
     } catch {
@@ -108,7 +111,6 @@ function App() {
     fetchMoonPhase(newDateStr);
   };
 
-  // --- Particle options as before ---
   const particlesInit = async (engine) => {
     await loadFull(engine);
   };
@@ -132,12 +134,22 @@ function App() {
       opacity: {
         value: 0.8,
         random: true,
-        animation: { enable: true, speed: 1, minimumValue: 0.1, sync: false },
+        animation: {
+          enable: true,
+          speed: 1,
+          minimumValue: 0.1,
+          sync: false,
+        },
       },
       size: {
         value: 3,
         random: true,
-        animation: { enable: true, speed: 4, minimumValue: 0.3, sync: false },
+        animation: {
+          enable: true,
+          speed: 4,
+          minimumValue: 0.3,
+          sync: false,
+        },
       },
       move: {
         enable: true,
@@ -156,7 +168,6 @@ function App() {
     detectRetina: true,
   };
 
-  // --- Main render ---
   return (
     <div className="fixed inset-0 overflow-y-auto bg-gradient-to-b from-[#0B1120] to-[#1a1b26] text-white font-sans">
       {/* Particles Container */}
@@ -182,37 +193,6 @@ function App() {
           <Volume2 className="w-6 h-6 text-blue-400" />
         )}
       </motion.button>
-
-      {/* Day Navigation Buttons */}
-      <div
-        className={`
-          fixed bottom-4 z-20
-          flex gap-6
-          w-full justify-center
-          px-0
-          sm:left-4 sm:right-4 sm:justify-between sm:gap-0
-        `}
-      >
-        <motion.button
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
-          onClick={handlePreviousDay}
-          className="p-3 bg-gray-800/50 backdrop-blur-lg rounded-full hover:bg-gray-700/50 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400 active:bg-gray-700/70"
-          style={{ touchAction: "manipulation" }}
-        >
-          <ChevronLeft className="w-6 h-6 text-blue-400" />
-        </motion.button>
-
-        <motion.button
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
-          onClick={handleNextDay}
-          className="p-3 bg-gray-800/50 backdrop-blur-lg rounded-full hover:bg-gray-700/50 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400 active:bg-gray-700/70"
-          style={{ touchAction: "manipulation" }}
-        >
-          <ChevronRight className="w-6 h-6 text-blue-400" />
-        </motion.button>
-      </div>
 
       <div className="min-h-screen w-full p-4 md:p-8 lg:p-12">
         <motion.div
@@ -252,9 +232,10 @@ function App() {
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  onClick={() => dateInputRef.current && dateInputRef.current.showPicker
-                    ? dateInputRef.current.showPicker() // modern browsers
-                    : dateInputRef.current.click() // fallback
+                  onClick={() =>
+                    dateInputRef.current && dateInputRef.current.showPicker
+                      ? dateInputRef.current.showPicker()
+                      : dateInputRef.current.click()
                   }
                   className="w-full py-3 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2 text-lg"
                   disabled={loading}
@@ -323,8 +304,8 @@ function App() {
                   exit={{ opacity: 0 }}
                   className="flex-1 flex flex-col lg:flex-row gap-8"
                 >
-                  {/* Moon Image */}
-                  <div className="lg:flex-1 flex items-center justify-center">
+                  {/* Moon Image and Navigation */}
+                  <div className="lg:flex-1 flex flex-col items-center justify-center">
                     <motion.div
                       initial={{ scale: 0.8 }}
                       animate={{ scale: 1 }}
@@ -333,9 +314,29 @@ function App() {
                       <img
                         src={moonData.image_url}
                         alt="Moon Phase"
-                        className="w-full h-full object-cover rounded-full shadow-2xl  ring-blue-500/20"
+                        className="w-full h-full object-cover rounded-full shadow-2xl ring-blue-500/20"
                       />
                     </motion.div>
+
+                    {/* Navigation Buttons directly below Moon image */}
+                    <div className="flex justify-between items-center w-full mt-4 max-w-xl">
+                      <button
+                        onClick={handlePreviousDay}
+                        className="p-3 bg-gray-800/70 rounded-full hover:bg-gray-700/80 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400"
+                        style={{ touchAction: "manipulation" }}
+                        aria-label="Previous Day"
+                      >
+                        <ChevronLeft className="w-6 h-6 text-blue-400" />
+                      </button>
+                      <button
+                        onClick={handleNextDay}
+                        className="p-3 bg-gray-800/70 rounded-full hover:bg-gray-700/80 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400"
+                        style={{ touchAction: "manipulation" }}
+                        aria-label="Next Day"
+                      >
+                        <ChevronRight className="w-6 h-6 text-blue-400" />
+                      </button>
+                    </div>
                   </div>
 
                   {/* Moon Details */}
@@ -345,8 +346,7 @@ function App() {
                         Current Phase
                       </h3>
                       <p className="text-4xl font-bold mb-2">
-                        {moonData.illumination_percentage.toFixed(2)}%
-                        Illuminated
+                        {moonData.illumination_percentage.toFixed(2)}% Illuminated
                       </p>
                       <p className="text-xl text-gray-400">{moonData.date}</p>
                     </div>
