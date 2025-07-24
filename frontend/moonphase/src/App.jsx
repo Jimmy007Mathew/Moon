@@ -20,6 +20,7 @@ function App() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
   const [isMuted, setIsMuted] = useState(true);
+  const [showDatePicker, setShowDatePicker] = useState(false);
   const audioRef = useRef(new Audio("assets/star.mp3"));
 
   // Audio controls
@@ -122,6 +123,14 @@ function App() {
 
   const particlesInit = async (engine) => {
     await loadFull(engine);
+  };
+
+  // Handle Date Change from Modal
+  const handleDateChange = (e) => {
+    const newDate = e.target.value;
+    setDate(newDate);
+    fetchMoonPhase(newDate);
+    setShowDatePicker(false);
   };
 
   // --- Particle options as before ---
@@ -243,18 +252,13 @@ function App() {
               <div className="flex flex-col gap-4 bg-gray-800/50 p-6 rounded-lg backdrop-blur-lg">
                 <div className="flex items-center gap-3">
                   <Calendar className="w-6 h-6 text-blue-400 flex-shrink-0" />
-                  <input
-                    type="date"
-                    value={date}
-                    onChange={(e) => setDate(e.target.value)}
-                    className="bg-transparent border-none focus:outline-none focus:ring-0 text-white w-full text-lg"
-                    style={{ color: "#ffffff" }}
-                  />
+                  {/* The input is no longer here */}
+                  <span className="text-lg">{date}</span>
                 </div>
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  onClick={() => fetchMoonPhase(date)}
+                  onClick={() => setShowDatePicker(true)}
                   className="w-full py-3 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2 text-lg"
                   disabled={loading}
                   style={{ touchAction: "manipulation" }}
@@ -308,6 +312,39 @@ function App() {
                   {error}
                 </motion.div>
               )}
+
+              {/* Date Picker Modal */}
+              <AnimatePresence>
+                {showDatePicker && (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="fixed inset-0 flex items-center justify-center bg-black/60 z-50"
+                  >
+                    <motion.div
+                      initial={{ scale: 0.98 }}
+                      animate={{ scale: 1 }}
+                      exit={{ scale: 0.98 }}
+                      className="bg-gray-900 p-6 rounded-lg flex flex-col items-center gap-4"
+                    >
+                      <input
+                        type="date"
+                        value={date}
+                        onChange={handleDateChange}
+                        className="bg-transparent border border-blue-400 rounded px-3 py-2 text-lg text-white outline-none"
+                        autoFocus
+                      />
+                      <button
+                        className="mt-2 px-4 py-2 bg-blue-500 rounded text-white hover:bg-blue-600"
+                        onClick={() => setShowDatePicker(false)}
+                      >
+                        Cancel
+                      </button>
+                    </motion.div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
 
             {/* Center and Right - Moon Display and Details */}
